@@ -1,5 +1,7 @@
 # Yougile MCP Server
 
+[![MCPAmpel](https://img.shields.io/endpoint?url=https://mcpampel.com/badge/ichinya/yougile-mcp.json)](https://mcpampel.com/repo/ichinya/yougile-mcp)
+
 The Yougile MCP Server brings the power of Model Context Protocol (MCP) to Yougile, allowing AI agents and developer
 tools to interact programmatically with your Yougile workspace.
 
