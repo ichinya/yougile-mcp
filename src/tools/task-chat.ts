@@ -94,6 +94,50 @@ export const registerTaskChatTools = (server: McpServer) => {
   );
 
   server.tool(
+    "update_task_message",
+    "Edit an existing chat message in a task. Use to update a previously sent status/summary message instead of posting a new one.",
+    {
+      taskId: z.string().describe("The ID of the task containing the message (use the task UUID)"),
+      messageId: z.union([z.string(), z.number()]).describe("The ID of the message to edit (numeric id from get_task_chat)"),
+      text: z.string().describe("New message text"),
+      textHtml: z.string().optional().describe("HTML formatted message (optional)"),
+      label: z.string().optional().describe("Quick link label (optional)"),
+    },
+    async ({ taskId, messageId, text, textHtml, label }) => {
+      try {
+        const messageData: any = {
+          text,
+          textHtml: textHtml || "",
+          label: label || "",
+        };
+        const result = await makeYougileRequest(
+          "PUT",
+          `chats/${taskId}/messages/${messageId}`,
+          messageData,
+        );
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error updating message: ${errorMessage}`,
+            },
+          ],
+        };
+      }
+    },
+  );
+
+  server.tool(
     "send_task_file",
     "Upload a file and send it to task chat in one step. Handles the /root/#file: prefix automatically.",
     {
