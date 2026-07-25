@@ -7,7 +7,7 @@ import { registerTools } from "./tools/index.js";
  * Create and configure the MCP server
  * @returns Object containing the server instance and version
  */
-export function createServer() {
+export function createServer(): { server: McpServer; version: string } {
   const version = getVersion();
 
   const server = new McpServer({

@@ -22,6 +22,6 @@ const pkg = JSON.parse(pkgContent);
  * Get the current version from package.json
  * @returns Version string from package.json
  */
-export function getVersion() {
+export function getVersion(): string {
     return pkg.version;
 }
