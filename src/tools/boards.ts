@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { makeYougileRequest } from "../common/request-helper.js";
 import { buildQueryString } from "../common/helpers.js";
-import type { Board, ApiResponse } from "../types/index.js";
+import type { Board } from "../types/index.js";
 
 /**
  * Register board-related MCP tools

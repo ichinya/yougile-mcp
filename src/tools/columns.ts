@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { makeYougileRequest } from "../common/request-helper.js";
 import { buildQueryString } from "../common/helpers.js";
-import type { Column, ApiResponse } from "../types/index.js";
+import type { Column } from "../types/index.js";
 
 /**
  * Register column-related MCP tools

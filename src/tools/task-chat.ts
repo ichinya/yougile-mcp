@@ -115,10 +115,7 @@ export const registerTaskChatTools = (server: McpServer) => {
         formData.append("file", new Blob([fileContent]), fileName);
 
         const uploadResponse = await axios.post<FileUploadResponse>(uploadUrl, formData, {
-          headers: {
-            ...headers,
-            "Content-Type": "multipart/form-data",
-          },
+          headers,
         });
 
         const fileUrl = uploadResponse.data.url || uploadResponse.data.fileUrl;

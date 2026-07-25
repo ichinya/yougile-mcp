@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
 import { makeYougileRequest } from "../common/request-helper.js";
-import type { Project, ApiResponse } from "../types/index.js";
+import type { Project } from "../types/index.js";
 
 /**
  * Register project-related MCP tools
