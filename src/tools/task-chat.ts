@@ -5,7 +5,13 @@ import * as path from "path";
 import axios from "axios";
 
 import { makeYougileRequest } from "../common/request-helper.js";
+import { buildQueryString } from "../common/helpers.js";
+import type { ChatMessage, ApiResponse, FileUploadResponse } from "../types/index.js";
 
+/**
+ * Register task chat-related MCP tools
+ * @param server - MCP server instance
+ */
 export const registerTaskChatTools = (server: McpServer) => {
   server.tool(
     "get_task_chat",
@@ -17,18 +23,9 @@ export const registerTaskChatTools = (server: McpServer) => {
     },
     async ({ taskId, limit, offset }) => {
       try {
-        // Build query parameters for pagination
-        let queryString = '';
-        if (limit !== undefined || offset !== undefined) {
-          const params = new URLSearchParams();
-          if (limit !== undefined) params.append('limit', limit.toString());
-          if (offset !== undefined) params.append('offset', offset.toString());
-          queryString = '?' + params.toString();
-        }
-
-        // Use the correct Yougile API endpoint: /api-v2/chats/{taskId}/messages
-        const path = `chats/${taskId}/messages${queryString}`;
-        const messages = await makeYougileRequest("GET", path);
+        const queryString = buildQueryString({ limit, offset });
+        const path = `chats/${taskId}/messages${queryString ? '?' + queryString : ''}`;
+        const messages = await makeYougileRequest<ApiResponse<ChatMessage>>("GET", path);
         
         return {
           content: [
@@ -63,13 +60,13 @@ export const registerTaskChatTools = (server: McpServer) => {
     },
     async ({ taskId, text, textHtml, label }) => {
       try {
-        const messageData: any = { 
+        const messageData: Partial<ChatMessage> = { 
           text,
           textHtml: textHtml || "",
           label: label || ""
         };
         
-        const result = await makeYougileRequest("POST", `chats/${taskId}/messages`, messageData);
+        const result = await makeYougileRequest<ChatMessage>("POST", `chats/${taskId}/messages`, messageData);
         
         return {
           content: [
@@ -117,11 +114,8 @@ export const registerTaskChatTools = (server: McpServer) => {
         const fileName = path.basename(filePath);
         formData.append("file", new Blob([fileContent]), fileName);
 
-        const uploadResponse = await axios.post(uploadUrl, formData, {
-          headers: {
-            ...headers,
-            "Content-Type": "multipart/form-data",
-          },
+        const uploadResponse = await axios.post<FileUploadResponse>(uploadUrl, formData, {
+          headers,
         });
 
         const fileUrl = uploadResponse.data.url || uploadResponse.data.fileUrl;
@@ -141,7 +135,7 @@ export const registerTaskChatTools = (server: McpServer) => {
           label: ""
         };
         
-        const result = await makeYougileRequest("POST", `chats/${taskId}/messages`, messageData) as any;
+        const result = await makeYougileRequest<ChatMessage>("POST", `chats/${taskId}/messages`, messageData);
         
         return {
           content: [
@@ -182,18 +176,9 @@ export const registerTaskChatTools = (server: McpServer) => {
     },
     async ({ taskId, limit, offset }) => {
       try {
-        // Build query parameters for pagination
-        let queryString = '';
-        if (limit !== undefined || offset !== undefined) {
-          const params = new URLSearchParams();
-          if (limit !== undefined) params.append('limit', limit.toString());
-          if (offset !== undefined) params.append('offset', offset.toString());
-          queryString = '?' + params.toString();
-        }
-
-        // Alternative method using the correct endpoint
-        const path = `chats/${taskId}/messages${queryString}`;
-        const messages = await makeYougileRequest("GET", path);
+        const queryString = buildQueryString({ limit, offset });
+        const path = `chats/${taskId}/messages${queryString ? '?' + queryString : ''}`;
+        const messages = await makeYougileRequest<ApiResponse<ChatMessage>>("GET", path);
         
         return {
           content: [

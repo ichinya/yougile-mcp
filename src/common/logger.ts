@@ -18,7 +18,14 @@ if (DEBUG_ENABLED) {
     logStream = createWriteStream(LOG_FILE_PATH, { flags: 'a' });
 }
 
-export function logRequest(method: string, url: string, headers: Record<string, string>, body: any = null) {
+/**
+ * Log an HTTP request to the debug log file
+ * @param method - HTTP method (GET, POST, PUT, DELETE)
+ * @param url - Full request URL
+ * @param headers - Request headers
+ * @param body - Optional request body
+ */
+export function logRequest(method: string, url: string, headers: Record<string, string>, body: unknown = null): void {
   if (!DEBUG_ENABLED || !logStream) return;
   
   const timestamp = new Date().toISOString();
@@ -40,7 +47,13 @@ export function logRequest(method: string, url: string, headers: Record<string, 
   logStream.write('---\n');
 }
 
-export function logResponse(url: string, status: number, response: any) {
+/**
+ * Log an HTTP response to the debug log file
+ * @param url - Request URL
+ * @param status - HTTP status code
+ * @param response - Response data
+ */
+export function logResponse(url: string, status: number, response: unknown): void {
   if (!DEBUG_ENABLED || !logStream) return;
   
   const timestamp = new Date().toISOString();
@@ -55,7 +68,12 @@ export function logResponse(url: string, status: number, response: any) {
   logStream.write('---\n');
 }
 
-export function logError(url: string, error: any) {
+/**
+ * Log an error to the debug log file
+ * @param url - Request URL that failed
+ * @param error - Error object or message
+ */
+export function logError(url: string, error: unknown): void {
   if (!DEBUG_ENABLED || !logStream) return;
   
   const timestamp = new Date().toISOString();

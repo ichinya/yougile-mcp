@@ -1,10 +1,14 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import * as fs from "fs";
-import * as path from "path";
 
 import { makeYougileRequest } from "../common/request-helper.js";
+import { buildQueryString } from "../common/helpers.js";
+import type { Task, ApiResponse } from "../types/index.js";
 
+/**
+ * Register task-related MCP tools
+ * @param server - MCP server instance
+ */
 export const registerTaskTools = (server: McpServer) => {
   server.tool(
     "get_tasks",
@@ -17,18 +21,10 @@ export const registerTaskTools = (server: McpServer) => {
       offset: z.number().optional().describe("Offset for pagination"),
     },
     async ({ columnId, assignedTo, title, limit, offset }) => {
-      // Build query parameters - NOTE: projectId is NOT supported by YouGile API!
-      const queryParams = new URLSearchParams();
-      if (columnId) queryParams.append('columnId', columnId);
-      if (assignedTo) queryParams.append('assignedTo', assignedTo);
-      if (title) queryParams.append('title', title);
-      if (limit) queryParams.append('limit', limit.toString());
-      if (offset) queryParams.append('offset', offset.toString());
-
-      const queryString = queryParams.toString();
+      const queryString = buildQueryString({ columnId, assignedTo, title, limit, offset });
       const path = `task-list${queryString ? '?' + queryString : ''}`;
       
-      const tasks = await makeYougileRequest("GET", path);
+      const tasks = await makeYougileRequest<unknown>("GET", path);
       return {
         content: [
           {
@@ -50,9 +46,10 @@ export const registerTaskTools = (server: McpServer) => {
     },
     async ({ userId, includeCompleted = false, includeArchived = false }) => {
       // Use assignedTo filter directly - it works for all projects!
-      const response = await makeYougileRequest("GET", `task-list?assignedTo=${userId}&limit=500`) as any;
+      const queryString = buildQueryString({ assignedTo: userId, limit: 500 });
+      const response = await makeYougileRequest<ApiResponse<Task>>("GET", `task-list${queryString ? '?' + queryString : ''}`);
       
-      const allTasks: any[] = [];
+      const allTasks: Task[] = [];
       const tasks = response.content || [];
       
       for (const task of tasks) {
@@ -81,7 +78,7 @@ export const registerTaskTools = (server: McpServer) => {
       id: z.string().describe("The ID or code of the task (e.g., 'SAI-515' or UUID)"),
     },
     async ({ id }) => {
-      const task = await makeYougileRequest("GET", `tasks/${id}`);
+      const task = await makeYougileRequest<unknown>("GET", `tasks/${id}`);
       return {
         content: [
           {
@@ -104,7 +101,7 @@ export const registerTaskTools = (server: McpServer) => {
       stickers: z.record(z.string(), z.string()).optional().describe("Custom stickers as sticker ID → state ID"),
     },
     async ({ title, columnId, description, assigned, stickers }) => {
-      const taskData: any = { 
+      const taskData: Partial<Task> = { 
         title,
         columnId
       };
@@ -112,7 +109,7 @@ export const registerTaskTools = (server: McpServer) => {
       if (assigned) taskData.assigned = assigned;
       if (stickers) taskData.stickers = stickers;
 
-      const result = await makeYougileRequest("POST", "tasks", taskData);
+      const result = await makeYougileRequest<Task>("POST", "tasks", taskData);
       return {
         content: [
           {
@@ -138,7 +135,7 @@ export const registerTaskTools = (server: McpServer) => {
       stickers: z.record(z.string(), z.string()).optional().describe("Custom stickers as sticker ID → state ID. Use '-' to remove, sticker."),
     },
     async ({ id, title, description, columnId, assigned, completed, archived, stickers }) => {
-      const taskData: any = {};
+      const taskData: Partial<Task> = {};
       if (title !== undefined) taskData.title = title;
       if (description !== undefined) taskData.description = description;
       if (columnId !== undefined) taskData.columnId = columnId;
@@ -147,7 +144,7 @@ export const registerTaskTools = (server: McpServer) => {
       if (archived !== undefined) taskData.archived = archived;
       if (stickers !== undefined) taskData.stickers = stickers;
 
-      const result = await makeYougileRequest("PUT", `tasks/${id}`, taskData);
+      const result = await makeYougileRequest<Task>("PUT", `tasks/${id}`, taskData);
       return {
         content: [
           {

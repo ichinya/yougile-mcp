@@ -448,6 +448,7 @@ fabric.properties
 
 yougile-mcp-debug.log
 /.idea/
+/build/common/helpers.js
 /build/common/logger.js
 /build/common/request-helper.js
 /build/common/version.js
@@ -460,6 +461,7 @@ yougile-mcp-debug.log
 /build/tools/task-chat.js
 /build/tools/tasks.js
 /build/tools/users.js
+/build/types/index.js
 /build/cli.js
 /build/index.js
 /build/server.js
