@@ -2,7 +2,13 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
 import { makeYougileRequest } from "../common/request-helper.js";
+import { buildQueryString } from "../common/helpers.js";
+import type { User, ApiResponse } from "../types/index.js";
 
+/**
+ * Register user-related MCP tools
+ * @param server - MCP server instance
+ */
 export const registerUserTools = (server: McpServer) => {
   server.tool(
     "get_users",
@@ -14,17 +20,10 @@ export const registerUserTools = (server: McpServer) => {
       projectId: z.string().optional().describe("Filter by project ID"),
     },
     async ({ limit, offset, email, projectId }) => {
-      // Build query parameters
-      const queryParams = new URLSearchParams();
-      if (limit) queryParams.append('limit', limit.toString());
-      if (offset) queryParams.append('offset', offset.toString());
-      if (email) queryParams.append('email', email);
-      if (projectId) queryParams.append('projectId', projectId);
-
-      const queryString = queryParams.toString();
+      const queryString = buildQueryString({ limit, offset, email, projectId });
       const path = `users${queryString ? '?' + queryString : ''}`;
       
-      const users = await makeYougileRequest("GET", path);
+      const users = await makeYougileRequest<ApiResponse<User>>("GET", path);
       return {
         content: [
           {
@@ -43,7 +42,7 @@ export const registerUserTools = (server: McpServer) => {
       id: z.string().describe("The ID of the user to retrieve"),
     },
     async ({ id }) => {
-      const user = await makeYougileRequest("GET", `users/${id}`);
+      const user = await makeYougileRequest<User>("GET", `users/${id}`);
       return {
         content: [
           {
@@ -65,12 +64,12 @@ export const registerUserTools = (server: McpServer) => {
       role: z.string().optional().describe("The role of the user in the company"),
     },
     async ({ email, firstName, lastName, role }) => {
-      const userData: any = { email };
+      const userData: Partial<User> = { email };
       if (firstName) userData.firstName = firstName;
       if (lastName) userData.lastName = lastName;
       if (role) userData.role = role;
 
-      const result = await makeYougileRequest("POST", "users", userData);
+      const result = await makeYougileRequest<User>("POST", "users", userData);
       return {
         content: [
           {
@@ -92,12 +91,12 @@ export const registerUserTools = (server: McpServer) => {
       role: z.string().optional().describe("The new role of the user in the company"),
     },
     async ({ id, firstName, lastName, role }) => {
-      const userData: any = {};
+      const userData: Partial<User> = {};
       if (firstName) userData.firstName = firstName;
       if (lastName) userData.lastName = lastName;
       if (role) userData.role = role;
 
-      const result = await makeYougileRequest("PUT", `users/${id}`, userData);
+      const result = await makeYougileRequest<User>("PUT", `users/${id}`, userData);
       return {
         content: [
           {
@@ -116,7 +115,7 @@ export const registerUserTools = (server: McpServer) => {
       id: z.string().describe("The ID of the user to remove"),
     },
     async ({ id }) => {
-      const result = await makeYougileRequest("DELETE", `users/${id}`);
+      const result = await makeYougileRequest<unknown>("DELETE", `users/${id}`);
       return {
         content: [
           {

@@ -3,6 +3,13 @@
 The Yougile MCP Server brings the power of Model Context Protocol (MCP) to Yougile, allowing AI agents and developer
 tools to interact programmatically with your Yougile workspace.
 
+## Features
+
+- **Type-Safe**: Built with TypeScript for enhanced reliability and maintainability
+- **Well-Documented**: Comprehensive JSDoc comments for all exported functions
+- **Refactored**: Shared helper functions reduce code duplication
+- **Modern Dependencies**: Updated to latest stable versions (Yargs v18, Zod v4, ESLint v10)
+
 ## What can you do with it?
 
 This server unlocks all sorts of useful capabilities for anyone working with Yougile:
@@ -16,7 +23,7 @@ This server unlocks all sorts of useful capabilities for anyone working with You
 
 ## Prerequisites
 
-- Node.js 18 or higher
+- Node.js 20.19 or higher
 - A Yougile account with appropriate permissions
 - An API key for your Yougile company
 

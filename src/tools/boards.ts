@@ -2,7 +2,13 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
 import { makeYougileRequest } from "../common/request-helper.js";
+import { buildQueryString } from "../common/helpers.js";
+import type { Board } from "../types/index.js";
 
+/**
+ * Register board-related MCP tools
+ * @param server - MCP server instance
+ */
 export const registerBoardTools = (server: McpServer) => {
   server.tool(
     "get_boards",
@@ -14,17 +20,10 @@ export const registerBoardTools = (server: McpServer) => {
       projectId: z.string().optional().describe("Filter by project ID"),
     },
     async ({ limit, offset, title, projectId }) => {
-      // Build query parameters
-      const queryParams = new URLSearchParams();
-      if (limit) queryParams.append('limit', limit.toString());
-      if (offset) queryParams.append('offset', offset.toString());
-      if (title) queryParams.append('title', title);
-      if (projectId) queryParams.append('projectId', projectId);
-
-      const queryString = queryParams.toString();
+      const queryString = buildQueryString({ limit, offset, title, projectId });
       const path = `boards${queryString ? '?' + queryString : ''}`;
       
-      const boards = await makeYougileRequest("GET", path);
+      const boards = await makeYougileRequest<unknown>("GET", path);
       return {
         content: [
           {
@@ -43,7 +42,7 @@ export const registerBoardTools = (server: McpServer) => {
       id: z.string().describe("The ID of the board to retrieve"),
     },
     async ({ id }) => {
-      const board = await makeYougileRequest("GET", `boards/${id}`);
+      const board = await makeYougileRequest<unknown>("GET", `boards/${id}`);
       return {
         content: [
           {
@@ -64,13 +63,13 @@ export const registerBoardTools = (server: McpServer) => {
       description: z.string().optional().describe("The description of the board"),
     },
     async ({ title, projectId, description }) => {
-      const boardData: any = { 
+      const boardData: Partial<Board> = { 
         title,
         projectId
       };
       if (description) boardData.description = description;
 
-      const result = await makeYougileRequest("POST", "boards", boardData);
+      const result = await makeYougileRequest<Board>("POST", "boards", boardData);
       return {
         content: [
           {
@@ -91,11 +90,11 @@ export const registerBoardTools = (server: McpServer) => {
       description: z.string().optional().describe("The new description of the board"),
     },
     async ({ id, title, description }) => {
-      const boardData: any = {};
+      const boardData: Partial<Board> = {};
       if (title) boardData.title = title;
       if (description) boardData.description = description;
 
-      const result = await makeYougileRequest("PUT", `boards/${id}`, boardData);
+      const result = await makeYougileRequest<Board>("PUT", `boards/${id}`, boardData);
       return {
         content: [
           {

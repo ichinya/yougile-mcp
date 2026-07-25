@@ -1,16 +1,23 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { logRequest, logResponse, logError } from "./logger.js";
 
-export async function makeYougileRequest<T>(method: string, path: string, body: any = null): Promise<T> {
+/**
+ * Make an authenticated request to the Yougile API
+ * @param method - HTTP method (GET, POST, PUT, DELETE)
+ * @param path - API endpoint path (e.g., "users", "tasks/123")
+ * @param body - Request body for POST/PUT requests
+ * @returns Typed response data from the API
+ * @throws Error if the request fails
+ */
+export async function makeYougileRequest<T>(method: string, path: string, body: unknown = null): Promise<T> {
   const hostUrl = process.env.YOUGILE_API_HOST_URL || "https://yougile.com/api-v2/";
   const host = hostUrl.endsWith("/") ? hostUrl : `${hostUrl}`;
   const url = `${host}${path}`;
   const headers: Record<string, string> = {
     "Authorization": `Bearer ${process.env.YOUGILE_API_KEY || ""}`,
-    "Content-Type": "application/json"
   };
 
-  // Only add Content-Type for non-GET requests if it's not already set
+  // Add Content-Type for non-GET requests
   if (method.toUpperCase() !== 'GET') {
     headers["Content-Type"] = "application/json";
   }
