@@ -5,7 +5,14 @@ import * as path from "path";
 import axios from "axios";
 
 import { logRequest, logResponse, logError } from "../common/logger.js";
+import type { FileUploadResponse } from "../types/index.js";
 
+/**
+ * Upload a file to Yougile and return its URL
+ * @param filePath - Local path to the file to upload
+ * @returns URL of the uploaded file
+ * @throws Error if upload fails
+ */
 async function uploadFileToYougile(filePath: string): Promise<string> {
   const hostUrl = process.env.YOUGILE_API_HOST_URL || "https://yougile.com/api-v2/";
   const host = hostUrl.endsWith("/") ? hostUrl : `${hostUrl}`;
@@ -24,17 +31,18 @@ async function uploadFileToYougile(filePath: string): Promise<string> {
     
     formData.append("file", new Blob([fileContent]), fileName);
 
-    const response = await axios.post(url, formData, {
-      headers: {
-        ...headers,
-        "Content-Type": "multipart/form-data",
-      },
+    const response = await axios.post<FileUploadResponse>(url, formData, {
+      headers,
     });
 
     logResponse(url, response.status, response.data);
     
     // Return the file URL
-    return response.data.url || response.data.fileUrl || response.data;
+    const fileUrl = response.data.url || response.data.fileUrl;
+    if (!fileUrl) {
+      throw new Error("Failed to get file URL from upload response");
+    }
+    return fileUrl;
   } catch (error) {
     logError(url, error);
     
@@ -45,6 +53,10 @@ async function uploadFileToYougile(filePath: string): Promise<string> {
   }
 }
 
+/**
+ * Register file-related MCP tools
+ * @param server - MCP server instance
+ */
 export const registerFileTools = (server: McpServer) => {
   server.tool(
     "upload_file",

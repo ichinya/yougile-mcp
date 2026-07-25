@@ -2,14 +2,19 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
 import { makeYougileRequest } from "../common/request-helper.js";
+import type { Project, ApiResponse } from "../types/index.js";
 
+/**
+ * Register project-related MCP tools
+ * @param server - MCP server instance
+ */
 export const registerProjectTools = (server: McpServer) => {
   server.tool(
     "get_projects",
     "Get all projects for the current user",
     {},
     async () => {
-      const projects = await makeYougileRequest("GET", "projects");
+      const projects = await makeYougileRequest<unknown>("GET", "projects");
       return {
         content: [
           {
@@ -28,7 +33,7 @@ export const registerProjectTools = (server: McpServer) => {
       id: z.string().describe("The ID of the project to retrieve"),
     },
     async ({ id }) => {
-      const project = await makeYougileRequest("GET", `projects/${id}`);
+      const project = await makeYougileRequest<unknown>("GET", `projects/${id}`);
       return {
         content: [
           {
@@ -49,11 +54,11 @@ export const registerProjectTools = (server: McpServer) => {
       color: z.string().optional().describe("Color code for the project"),
     },
     async ({ title, description, color }) => {
-      const projectData: any = { title };
+      const projectData: Partial<Project> = { title };
       if (description) projectData.description = description;
       if (color) projectData.color = color;
 
-      const result = await makeYougileRequest("POST", "projects", projectData);
+      const result = await makeYougileRequest<Project>("POST", "projects", projectData);
       return {
         content: [
           {
@@ -75,12 +80,12 @@ export const registerProjectTools = (server: McpServer) => {
       color: z.string().optional().describe("New color code for the project"),
     },
     async ({ id, title, description, color }) => {
-      const projectData: any = {};
+      const projectData: Partial<Project> = {};
       if (title) projectData.title = title;
       if (description) projectData.description = description;
       if (color) projectData.color = color;
 
-      const result = await makeYougileRequest("PUT", `projects/${id}`, projectData);
+      const result = await makeYougileRequest<Project>("PUT", `projects/${id}`, projectData);
       return {
         content: [
           {

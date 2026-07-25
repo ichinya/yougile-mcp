@@ -18,6 +18,13 @@ if (DEBUG_ENABLED) {
     logStream = createWriteStream(LOG_FILE_PATH, { flags: 'a' });
 }
 
+/**
+ * Log an HTTP request to the debug log file
+ * @param method - HTTP method (GET, POST, PUT, DELETE)
+ * @param url - Full request URL
+ * @param headers - Request headers
+ * @param body - Optional request body
+ */
 export function logRequest(method: string, url: string, headers: Record<string, string>, body: any = null) {
   if (!DEBUG_ENABLED || !logStream) return;
   
@@ -40,6 +47,12 @@ export function logRequest(method: string, url: string, headers: Record<string, 
   logStream.write('---\n');
 }
 
+/**
+ * Log an HTTP response to the debug log file
+ * @param url - Request URL
+ * @param status - HTTP status code
+ * @param response - Response data
+ */
 export function logResponse(url: string, status: number, response: any) {
   if (!DEBUG_ENABLED || !logStream) return;
   
@@ -55,6 +68,11 @@ export function logResponse(url: string, status: number, response: any) {
   logStream.write('---\n');
 }
 
+/**
+ * Log an error to the debug log file
+ * @param url - Request URL that failed
+ * @param error - Error object or message
+ */
 export function logError(url: string, error: any) {
   if (!DEBUG_ENABLED || !logStream) return;
   

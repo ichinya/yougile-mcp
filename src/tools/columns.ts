@@ -2,7 +2,13 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
 import { makeYougileRequest } from "../common/request-helper.js";
+import { buildQueryString } from "../common/helpers.js";
+import type { Column, ApiResponse } from "../types/index.js";
 
+/**
+ * Register column-related MCP tools
+ * @param server - MCP server instance
+ */
 export const registerColumnTools = (server: McpServer) => {
   server.tool(
     "get_columns",
@@ -14,17 +20,10 @@ export const registerColumnTools = (server: McpServer) => {
       title: z.string().optional().describe("Filter by column title"),
     },
     async ({ boardId, limit, offset, title }) => {
-      // Build query parameters
-      const queryParams = new URLSearchParams();
-      queryParams.append('boardId', boardId);
-      if (limit) queryParams.append('limit', limit.toString());
-      if (offset) queryParams.append('offset', offset.toString());
-      if (title) queryParams.append('title', title);
-
-      const queryString = queryParams.toString();
+      const queryString = buildQueryString({ boardId, limit, offset, title });
       const path = `columns${queryString ? '?' + queryString : ''}`;
       
-      const columns = await makeYougileRequest("GET", path);
+      const columns = await makeYougileRequest<unknown>("GET", path);
       return {
         content: [
           {
@@ -43,7 +42,7 @@ export const registerColumnTools = (server: McpServer) => {
       id: z.string().describe("The ID of the column to retrieve"),
     },
     async ({ id }) => {
-      const column = await makeYougileRequest("GET", `columns/${id}`);
+      const column = await makeYougileRequest<unknown>("GET", `columns/${id}`);
       return {
         content: [
           {
@@ -64,13 +63,13 @@ export const registerColumnTools = (server: McpServer) => {
       description: z.string().optional().describe("The description of the column"),
     },
     async ({ title, boardId, description }) => {
-      const columnData: any = { 
+      const columnData: Partial<Column> = { 
         title,
         boardId
       };
       if (description) columnData.description = description;
 
-      const result = await makeYougileRequest("POST", "columns", columnData);
+      const result = await makeYougileRequest<Column>("POST", "columns", columnData);
       return {
         content: [
           {
@@ -91,11 +90,11 @@ export const registerColumnTools = (server: McpServer) => {
       description: z.string().optional().describe("The new description of the column"),
     },
     async ({ id, title, description }) => {
-      const columnData: any = {};
+      const columnData: Partial<Column> = {};
       if (title) columnData.title = title;
       if (description) columnData.description = description;
 
-      const result = await makeYougileRequest("PUT", `columns/${id}`, columnData);
+      const result = await makeYougileRequest<Column>("PUT", `columns/${id}`, columnData);
       return {
         content: [
           {

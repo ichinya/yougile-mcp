@@ -18,6 +18,10 @@ try {
 
 const pkg = JSON.parse(pkgContent);
 
+/**
+ * Get the current version from package.json
+ * @returns Version string from package.json
+ */
 export function getVersion() {
     return pkg.version;
 }

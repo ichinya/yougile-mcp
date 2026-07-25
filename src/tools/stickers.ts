@@ -2,7 +2,12 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
 import { makeYougileRequest } from "../common/request-helper.js";
+import { buildQueryString } from "../common/helpers.js";
 
+/**
+ * Register sticker-related MCP tools
+ * @param server - MCP server instance
+ */
 export const registerStickerTools = (server: McpServer) => {
   server.tool(
     "get_string_stickers",
@@ -14,16 +19,10 @@ export const registerStickerTools = (server: McpServer) => {
       name: z.string().optional().describe("Filter by sticker name"),
     },
     async ({ boardId, limit, offset, name }) => {
-      const queryParams = new URLSearchParams();
-      if (boardId) queryParams.append('boardId', boardId);
-      if (limit !== undefined) queryParams.append('limit', limit.toString());
-      if (offset !== undefined) queryParams.append('offset', offset.toString());
-      if (name) queryParams.append('name', name);
-
-      const queryString = queryParams.toString();
+      const queryString = buildQueryString({ boardId, limit, offset, name });
       const path = `string-stickers${queryString ? '?' + queryString : ''}`;
       
-      const stickers = await makeYougileRequest("GET", path);
+      const stickers = await makeYougileRequest<unknown>("GET", path);
       return {
         content: [
           {
