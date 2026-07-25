@@ -30,18 +30,11 @@ To build the TypeScript code:
 npm run build
 ```
 
-### Testing
-
-Run the test suite:
-```bash
-npm test
-```
-
 ### Code Style
 
-This project uses ESLint and Prettier for code formatting:
+This project follows the type-safety and code-style guidelines below. Ensure the TypeScript build passes before submitting changes:
 ```bash
-npm run lint
+npm run build
 ```
 
 ## Project Structure
@@ -87,8 +80,7 @@ yougile-mcp/
 1. Create a new branch for your feature
 2. Make your changes following the guidelines above
 3. Ensure the build passes: `npm run build`
-4. Run linting: `npm run lint`
-5. Submit a pull request with a clear description of your changes
+4. Submit a pull request with a clear description of your changes
 
 ## Questions?
 

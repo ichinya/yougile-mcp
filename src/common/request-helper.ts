@@ -9,7 +9,7 @@ import { logRequest, logResponse, logError } from "./logger.js";
  * @returns Typed response data from the API
  * @throws Error if the request fails
  */
-export async function makeYougileRequest<T>(method: string, path: string, body: any = null): Promise<T> {
+export async function makeYougileRequest<T>(method: string, path: string, body: unknown = null): Promise<T> {
   const hostUrl = process.env.YOUGILE_API_HOST_URL || "https://yougile.com/api-v2/";
   const host = hostUrl.endsWith("/") ? hostUrl : `${hostUrl}`;
   const url = `${host}${path}`;

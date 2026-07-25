@@ -23,7 +23,7 @@ This server unlocks all sorts of useful capabilities for anyone working with You
 
 ## Prerequisites
 
-- Node.js 18 or higher
+- Node.js 20.19 or higher
 - A Yougile account with appropriate permissions
 - An API key for your Yougile company
 
