@@ -2,12 +2,25 @@
  * Shared TypeScript type definitions for Yougile API responses
  */
 
+export interface CustomStatus {
+  emoji?: string;
+  text?: string;
+}
+
 export interface User {
   id: string;
   email?: string;
   firstName?: string;
   lastName?: string;
   role?: string;
+  messengerOnly?: boolean;
+  customStatus?: CustomStatus;
+  hasFakeEmail?: boolean;
+}
+
+/** Request-only field accepted by create endpoints to make retries safe */
+export interface IdempotentCreate {
+  idempotencyKey?: string;
 }
 
 export interface Project {
@@ -15,6 +28,7 @@ export interface Project {
   title: string;
   description?: string;
   color?: string;
+  departments?: Record<string, { manager?: string; member?: string } | "-">;
 }
 
 export interface Task {
@@ -27,6 +41,8 @@ export interface Task {
   archived?: boolean;
   stickers?: Record<string, string>;
   chatId?: string;
+  extensionData?: Record<string, unknown>;
+  properties?: Record<string, unknown>;
 }
 
 export interface Board {

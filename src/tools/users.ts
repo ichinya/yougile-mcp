@@ -55,6 +55,23 @@ export const registerUserTools = (server: McpServer) => {
   );
 
   server.tool(
+    "get_me",
+    "Get the current authenticated user (the user the API key belongs to)",
+    {},
+    async () => {
+      const user = await makeYougileRequest<User>("GET", "users/me");
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(user, null, 2),
+          },
+        ],
+      };
+    }
+  );
+
+  server.tool(
     "create_user",
     "Invite a user to the company",
     {
@@ -62,12 +79,14 @@ export const registerUserTools = (server: McpServer) => {
       firstName: z.string().optional().describe("The first name of the user"),
       lastName: z.string().optional().describe("The last name of the user"),
       role: z.string().optional().describe("The role of the user in the company"),
+      messengerOnly: z.boolean().optional().describe("Whether the user has access to the messenger only"),
     },
-    async ({ email, firstName, lastName, role }) => {
+    async ({ email, firstName, lastName, role, messengerOnly }) => {
       const userData: Partial<User> = { email };
       if (firstName) userData.firstName = firstName;
       if (lastName) userData.lastName = lastName;
       if (role) userData.role = role;
+      if (messengerOnly !== undefined) userData.messengerOnly = messengerOnly;
 
       const result = await makeYougileRequest<User>("POST", "users", userData);
       return {
@@ -89,12 +108,14 @@ export const registerUserTools = (server: McpServer) => {
       firstName: z.string().optional().describe("The new first name of the user"),
       lastName: z.string().optional().describe("The new last name of the user"),
       role: z.string().optional().describe("The new role of the user in the company"),
+      messengerOnly: z.boolean().optional().describe("Whether the user has access to the messenger only"),
     },
-    async ({ id, firstName, lastName, role }) => {
+    async ({ id, firstName, lastName, role, messengerOnly }) => {
       const userData: Partial<User> = {};
       if (firstName) userData.firstName = firstName;
       if (lastName) userData.lastName = lastName;
       if (role) userData.role = role;
+      if (messengerOnly !== undefined) userData.messengerOnly = messengerOnly;
 
       const result = await makeYougileRequest<User>("PUT", `users/${id}`, userData);
       return {

@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
 import { makeYougileRequest } from "../common/request-helper.js";
-import type { Project } from "../types/index.js";
+import type { Project, IdempotentCreate } from "../types/index.js";
 
 /**
  * Register project-related MCP tools
@@ -52,11 +52,15 @@ export const registerProjectTools = (server: McpServer) => {
       title: z.string().describe("The name/title of the project"),
       description: z.string().optional().describe("The description of the project"),
       color: z.string().optional().describe("Color code for the project"),
+      departments: z.record(z.string(), z.record(z.string(), z.string())).optional().describe("Departments on the project and role mapping: department ID → { manager, member }"),
+      idempotencyKey: z.string().optional().describe("Idempotency key: retrying the request with the same key returns the already created project instead of duplicating it"),
     },
-    async ({ title, description, color }) => {
-      const projectData: Partial<Project> = { title };
+    async ({ title, description, color, departments, idempotencyKey }) => {
+      const projectData: Partial<Project> & IdempotentCreate = { title };
       if (description) projectData.description = description;
       if (color) projectData.color = color;
+      if (departments) projectData.departments = departments;
+      if (idempotencyKey) projectData.idempotencyKey = idempotencyKey;
 
       const result = await makeYougileRequest<Project>("POST", "projects", projectData);
       return {
@@ -78,12 +82,14 @@ export const registerProjectTools = (server: McpServer) => {
       title: z.string().optional().describe("The new name/title of the project"),
       description: z.string().optional().describe("The new description of the project"),
       color: z.string().optional().describe("New color code for the project"),
+      departments: z.record(z.string(), z.record(z.string(), z.string())).optional().describe("Departments and role mapping: department ID → { manager, member }. Use department ID '-' to remove a department binding"),
     },
-    async ({ id, title, description, color }) => {
+    async ({ id, title, description, color, departments }) => {
       const projectData: Partial<Project> = {};
       if (title) projectData.title = title;
       if (description) projectData.description = description;
       if (color) projectData.color = color;
+      if (departments) projectData.departments = departments;
 
       const result = await makeYougileRequest<Project>("PUT", `projects/${id}`, projectData);
       return {

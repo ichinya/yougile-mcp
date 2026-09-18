@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { makeYougileRequest } from "../common/request-helper.js";
 import { buildQueryString } from "../common/helpers.js";
-import type { Task, ApiResponse } from "../types/index.js";
+import type { Task, ApiResponse, IdempotentCreate } from "../types/index.js";
 
 /**
  * Register task-related MCP tools
@@ -99,15 +99,17 @@ export const registerTaskTools = (server: McpServer) => {
       description: z.string().optional().describe("The description of the task"),
       assigned: z.array(z.string()).optional().describe("Array of user IDs to assign the task to"),
       stickers: z.record(z.string(), z.string()).optional().describe("Custom stickers as sticker ID → state ID"),
+      idempotencyKey: z.string().optional().describe("Idempotency key: retrying the request with the same key returns the already created task instead of duplicating it"),
     },
-    async ({ title, columnId, description, assigned, stickers }) => {
-      const taskData: Partial<Task> = { 
+    async ({ title, columnId, description, assigned, stickers, idempotencyKey }) => {
+      const taskData: Partial<Task> & IdempotentCreate = {
         title,
         columnId
       };
       if (description) taskData.description = description;
       if (assigned) taskData.assigned = assigned;
       if (stickers) taskData.stickers = stickers;
+      if (idempotencyKey) taskData.idempotencyKey = idempotencyKey;
 
       const result = await makeYougileRequest<Task>("POST", "tasks", taskData);
       return {

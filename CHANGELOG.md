@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `get_me` tool returning the current authenticated user (`GET /users/me`)
+- `idempotencyKey` parameter for `create_task`, `create_project`, `create_board`, `create_column` (safe retries, no duplicates)
+- `messengerOnly` parameter for `create_user` and `update_user`
+- `departments` parameter for `create_project` and `update_project`
+- New response fields in types: user `customStatus`, `messengerOnly`, `hasFakeEmail`; task `extensionData`, `properties`; project `departments`
 - Type-safe TypeScript interfaces in `src/types/index.ts` for all API responses
 - `buildQueryString` helper function to reduce code duplication across tools
 - JSDoc comments to all exported functions for better documentation
@@ -16,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Shared type definitions for User, Project, Task, Board, Column, ChatMessage, ApiResponse, FileUploadResponse, and QueryParams
 
 ### Changed
+- Synced bundled OpenAPI spec `docs/open-api-v2.json` with the live API: added `GET /users/me`, `POST /chats/{chatId}/typing`, `/companies{*companyId}` (was `/companies*`)
 - Updated Yargs from v17 to v18
 - Updated Zod from v3 to v4
 - Updated ESLint from v9 to v10

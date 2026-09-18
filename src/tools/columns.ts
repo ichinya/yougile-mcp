@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { makeYougileRequest } from "../common/request-helper.js";
 import { buildQueryString } from "../common/helpers.js";
-import type { Column } from "../types/index.js";
+import type { Column, IdempotentCreate } from "../types/index.js";
 
 /**
  * Register column-related MCP tools
@@ -61,13 +61,15 @@ export const registerColumnTools = (server: McpServer) => {
       title: z.string().describe("The title of the column"),
       boardId: z.string().describe("The ID of the board the column belongs to"),
       description: z.string().optional().describe("The description of the column"),
+      idempotencyKey: z.string().optional().describe("Idempotency key: retrying the request with the same key returns the already created column instead of duplicating it"),
     },
-    async ({ title, boardId, description }) => {
-      const columnData: Partial<Column> = { 
+    async ({ title, boardId, description, idempotencyKey }) => {
+      const columnData: Partial<Column> & IdempotentCreate = {
         title,
         boardId
       };
       if (description) columnData.description = description;
+      if (idempotencyKey) columnData.idempotencyKey = idempotencyKey;
 
       const result = await makeYougileRequest<Column>("POST", "columns", columnData);
       return {

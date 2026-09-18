@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { makeYougileRequest } from "../common/request-helper.js";
 import { buildQueryString } from "../common/helpers.js";
-import type { Board } from "../types/index.js";
+import type { Board, IdempotentCreate } from "../types/index.js";
 
 /**
  * Register board-related MCP tools
@@ -61,13 +61,15 @@ export const registerBoardTools = (server: McpServer) => {
       title: z.string().describe("The title of the board"),
       projectId: z.string().describe("The ID of the project the board belongs to"),
       description: z.string().optional().describe("The description of the board"),
+      idempotencyKey: z.string().optional().describe("Idempotency key: retrying the request with the same key returns the already created board instead of duplicating it"),
     },
-    async ({ title, projectId, description }) => {
-      const boardData: Partial<Board> = { 
+    async ({ title, projectId, description, idempotencyKey }) => {
+      const boardData: Partial<Board> & IdempotentCreate = {
         title,
         projectId
       };
       if (description) boardData.description = description;
+      if (idempotencyKey) boardData.idempotencyKey = idempotencyKey;
 
       const result = await makeYougileRequest<Board>("POST", "boards", boardData);
       return {

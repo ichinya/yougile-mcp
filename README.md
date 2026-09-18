@@ -180,6 +180,7 @@ If you experience "MCP error -32000: Connection closed" when working with differ
 ### Users
 
 - `get_users` - Get all users in the company
+- `get_me` - Get the current authenticated user (the user the API key belongs to)
 - `get_user` - Get a specific user by ID
 - `create_user` - Invite a user to the company
 - `update_user` - Update an existing user
@@ -360,7 +361,7 @@ npm run dev
 
 ## API Coverage
 
-This MCP server implements **~30%** of the YouGile API v2.0 endpoints.
+This MCP server implements **~40%** of the YouGile API v2.0 endpoints.
 
 ### ⚠️ Important API Notes
 
@@ -369,10 +370,11 @@ This MCP server implements **~30%** of the YouGile API v2.0 endpoints.
 3. **Task codes like "SAI-515" work** in `get_task` - the API accepts both UUID and task codes.
 4. Use `get_user_tasks` for a complete list of user's tasks across all projects.
 
-### ✅ Implemented (22 tools)
+### ✅ Implemented (30 tools)
 
-#### Users (5 methods)
+#### Users (6 methods)
 - `get_users` - Get all users
+- `get_me` - Get the current authenticated user (API key owner)
 - `get_user` - Get user by ID
 - `create_user` - Invite user to company
 - `update_user` - Update user
