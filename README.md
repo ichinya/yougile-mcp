@@ -198,8 +198,10 @@ If you experience "MCP error -32000: Connection closed" when working with differ
 - `get_tasks` - Get tasks list with filters (columnId, assignedTo, title). **Note: projectId filter is NOT supported by YouGile API!**
 - `get_user_tasks` - Get ALL tasks assigned to a user (recommended for complete task list)
 - `get_task` - Get a specific task by ID (supports both UUID and task code like "SAI-515")
-- `create_task` - Create a new task
-- `update_task` - Update an existing task (supports completed, archived flags)
+- `create_task` - Create a new task (optional `subtasks` — IDs of child tasks)
+- `update_task` - Update an existing task (supports completed, archived flags and `subtasks`)
+- `add_subtask` - Attach an existing task as a subtask of a parent task (no duplicates)
+- `get_subtasks` - Get subtasks of a task with details of each subtask
 
 ### Boards
 

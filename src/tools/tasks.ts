@@ -99,9 +99,10 @@ export const registerTaskTools = (server: McpServer) => {
       description: z.string().optional().describe("The description of the task"),
       assigned: z.array(z.string()).optional().describe("Array of user IDs to assign the task to"),
       stickers: z.record(z.string(), z.string()).optional().describe("Custom stickers as sticker ID → state ID"),
+      subtasks: z.array(z.string()).optional().describe("Array of task IDs to attach as subtasks"),
       idempotencyKey: z.string().optional().describe("Idempotency key: retrying the request with the same key returns the already created task instead of duplicating it"),
     },
-    async ({ title, columnId, description, assigned, stickers, idempotencyKey }) => {
+    async ({ title, columnId, description, assigned, stickers, subtasks, idempotencyKey }) => {
       const taskData: Partial<Task> & IdempotentCreate = {
         title,
         columnId
@@ -109,6 +110,7 @@ export const registerTaskTools = (server: McpServer) => {
       if (description) taskData.description = description;
       if (assigned) taskData.assigned = assigned;
       if (stickers) taskData.stickers = stickers;
+      if (subtasks) taskData.subtasks = subtasks;
       if (idempotencyKey) taskData.idempotencyKey = idempotencyKey;
 
       const result = await makeYougileRequest<Task>("POST", "tasks", taskData);
@@ -135,8 +137,9 @@ export const registerTaskTools = (server: McpServer) => {
       completed: z.boolean().optional().describe("Mark task as completed"),
       archived: z.boolean().optional().describe("Archive/unarchive the task"),
       stickers: z.record(z.string(), z.string()).optional().describe("Custom stickers as sticker ID → state ID. Use '-' to remove, sticker."),
+      subtasks: z.array(z.string()).optional().describe("Array of subtask IDs to set on this task (replaces existing subtasks)"),
     },
-    async ({ id, title, description, columnId, assigned, completed, archived, stickers }) => {
+    async ({ id, title, description, columnId, assigned, completed, archived, stickers, subtasks }) => {
       const taskData: Partial<Task> = {};
       if (title !== undefined) taskData.title = title;
       if (description !== undefined) taskData.description = description;
@@ -145,6 +148,7 @@ export const registerTaskTools = (server: McpServer) => {
       if (completed !== undefined) taskData.completed = completed;
       if (archived !== undefined) taskData.archived = archived;
       if (stickers !== undefined) taskData.stickers = stickers;
+      if (subtasks !== undefined) taskData.subtasks = subtasks;
 
       const result = await makeYougileRequest<Task>("PUT", `tasks/${id}`, taskData);
       return {
@@ -152,6 +156,81 @@ export const registerTaskTools = (server: McpServer) => {
           {
             type: "text",
             text: JSON.stringify(result, null, 2),
+          },
+        ],
+      };
+    }
+  );
+
+  server.tool(
+    "add_subtask",
+    "Add a subtask to a parent task. Reads the parent, appends the child ID to its subtasks and updates the parent",
+    {
+      parentTaskId: z.string().describe("The ID of the parent task"),
+      childTaskId: z.string().describe("The ID of the task to attach as a subtask"),
+    },
+    async ({ parentTaskId, childTaskId }) => {
+      const parentTask = await makeYougileRequest<Task>("GET", `tasks/${parentTaskId}`);
+      const currentSubtasks = parentTask.subtasks ?? [];
+
+      if (currentSubtasks.includes(childTaskId)) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                message: "Child task is already a subtask of the parent",
+                parentTaskId,
+                childTaskId,
+                subtasks: currentSubtasks,
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      const update: Partial<Task> = { subtasks: [...currentSubtasks, childTaskId] };
+      const result = await makeYougileRequest<Task>("PUT", `tasks/${parentTaskId}`, update);
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(result, null, 2),
+          },
+        ],
+      };
+    }
+  );
+
+  server.tool(
+    "get_subtasks",
+    "Get subtasks of a task: their IDs and the details of each subtask",
+    {
+      taskId: z.string().describe("The ID of the parent task"),
+    },
+    async ({ taskId }) => {
+      const task = await makeYougileRequest<Task>("GET", `tasks/${taskId}`);
+      const subtaskIds = task.subtasks ?? [];
+
+      const subtasks = await Promise.all(
+        subtaskIds.map(async (id): Promise<Task | { id: string; error: string }> => {
+          try {
+            return await makeYougileRequest<Task>("GET", `tasks/${id}`);
+          } catch {
+            return { id, error: "Failed to fetch subtask details" };
+          }
+        })
+      );
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({
+              parentTaskId: taskId,
+              subtaskCount: subtasks.length,
+              subtasks,
+            }, null, 2),
           },
         ],
       };

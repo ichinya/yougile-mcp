@@ -40,6 +40,8 @@ export interface Task {
   completed?: boolean;
   archived?: boolean;
   stickers?: Record<string, string>;
+  /** IDs of subtasks attached to this task */
+  subtasks?: string[];
   chatId?: string;
   extensionData?: Record<string, unknown>;
   properties?: Record<string, unknown>;
