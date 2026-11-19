@@ -1,0 +1,37 @@
+name: MCP Quality
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  mcpunit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    env:
+      YOUGILE_API_KEY: ci-dummy-key
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - uses: lee-to/mcpunit@v1
+        with:
+          cmd: node ./build/index.js
+          min-score: "90"
+          upload-sarif: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+          markdown-out: mcpunit.md
+
+      - name: Audit summary
+        if: always() && hashFiles('mcpunit.md') != ''
+        shell: bash
+        run: cat mcpunit.md >> "$GITHUB_STEP_SUMMARY"
