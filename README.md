@@ -1,5 +1,10 @@
 # Yougile MCP Server
 
+> [!IMPORTANT]
+> YouGile now offers an **official MCP server**. We recommend using it for new integrations.
+>
+> Connect your MCP client to `https://ru.yougile.com/data/ai/mcp` and follow the [official setup guide](https://ru.yougile.com/data/ai/mcp/setup.md).
+
 The Yougile MCP Server brings the power of Model Context Protocol (MCP) to Yougile, allowing AI agents and developer
 tools to interact programmatically with your Yougile workspace.
 
