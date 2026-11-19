@@ -21,8 +21,8 @@ export const registerBoardTools = (server: McpServer) => {
     },
     async ({ limit, offset, title, projectId }) => {
       const queryString = buildQueryString({ limit, offset, title, projectId });
-      const path = `boards${queryString ? '?' + queryString : ''}`;
-      
+      const path = `boards${queryString ? "?" + queryString : ""}`;
+
       const boards = await makeYougileRequest<unknown>("GET", path);
       return {
         content: [
@@ -32,7 +32,7 @@ export const registerBoardTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 
   server.tool(
@@ -51,7 +51,7 @@ export const registerBoardTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 
   server.tool(
@@ -59,19 +59,33 @@ export const registerBoardTools = (server: McpServer) => {
     "Create a new board",
     {
       title: z.string().describe("The title of the board"),
-      projectId: z.string().describe("The ID of the project the board belongs to"),
-      description: z.string().optional().describe("The description of the board"),
-      idempotencyKey: z.string().optional().describe("Idempotency key: retrying the request with the same key returns the already created board instead of duplicating it"),
+      projectId: z
+        .string()
+        .describe("The ID of the project the board belongs to"),
+      description: z
+        .string()
+        .optional()
+        .describe("The description of the board"),
+      idempotencyKey: z
+        .string()
+        .optional()
+        .describe(
+          "Idempotency key: retrying the request with the same key returns the already created board instead of duplicating it",
+        ),
     },
     async ({ title, projectId, description, idempotencyKey }) => {
       const boardData: Partial<Board> & IdempotentCreate = {
         title,
-        projectId
+        projectId,
       };
       if (description) boardData.description = description;
       if (idempotencyKey) boardData.idempotencyKey = idempotencyKey;
 
-      const result = await makeYougileRequest<Board>("POST", "boards", boardData);
+      const result = await makeYougileRequest<Board>(
+        "POST",
+        "boards",
+        boardData,
+      );
       return {
         content: [
           {
@@ -80,7 +94,7 @@ export const registerBoardTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 
   server.tool(
@@ -89,14 +103,21 @@ export const registerBoardTools = (server: McpServer) => {
     {
       id: z.string().describe("The ID of the board to update"),
       title: z.string().optional().describe("The new title of the board"),
-      description: z.string().optional().describe("The new description of the board"),
+      description: z
+        .string()
+        .optional()
+        .describe("The new description of the board"),
     },
     async ({ id, title, description }) => {
       const boardData: Partial<Board> = {};
       if (title) boardData.title = title;
       if (description) boardData.description = description;
 
-      const result = await makeYougileRequest<Board>("PUT", `boards/${id}`, boardData);
+      const result = await makeYougileRequest<Board>(
+        "PUT",
+        `boards/${id}`,
+        boardData,
+      );
       return {
         content: [
           {
@@ -105,6 +126,6 @@ export const registerBoardTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 };

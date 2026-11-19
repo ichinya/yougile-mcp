@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-const {spawnSync} = require('child_process');
-const {existsSync} = require('fs');
-const {join} = require('path');
-const dotenv = require('dotenv');
+const { spawnSync } = require("child_process");
+const { existsSync } = require("fs");
+const { join } = require("path");
+const dotenv = require("dotenv");
 
-const projectRoot = join(__dirname, '..');
-dotenv.config({ path: join(projectRoot, '.env'), quiet: true });
+const projectRoot = join(__dirname, "..");
+dotenv.config({ path: join(projectRoot, ".env"), quiet: true });
 
 // Check API key
 if (!process.env.YOUGILE_API_KEY) {
@@ -16,16 +16,16 @@ if (!process.env.YOUGILE_API_KEY) {
 }
 
 // Build if needed
-const buildPath = join(projectRoot, 'build', 'cli.js');
+const buildPath = join(projectRoot, "build", "cli.js");
 if (!existsSync(buildPath)) {
   console.error("Building...");
-  const result = spawnSync('npx', ['tsc'], {
+  const result = spawnSync("npx", ["tsc"], {
     cwd: projectRoot,
-    stdio: 'inherit',
-    shell: true
+    stdio: "inherit",
+    shell: true,
   });
   if (result.status !== 0) {
-    console.error('Build failed');
+    console.error("Build failed");
     process.exit(1);
   }
 }

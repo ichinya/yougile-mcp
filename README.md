@@ -34,10 +34,12 @@ This server unlocks all sorts of useful capabilities for anyone working with You
 The easiest way to get your API key is through the built-in Yougile configurator.
 
 **How to open the configurator:**
+
 - Press `Ctrl + ~` in the Yougile app, **or**
 - Go to the Projects page → click the gear icon ⚙️ next to your company name → select "Configure" (Настроить)
 
 Once in the configurator:
+
 1. Navigate to API settings
 2. Generate or copy your API key
 
@@ -75,10 +77,12 @@ curl -X POST "https://yougile.com/api-v2/auth/keys/get" \
 You'll need your Company ID for some API operations. Here are the ways to get it:
 
 **Keyboard Shortcut (Recommended)**
+
 - Press `Ctrl + Alt + Q` (Windows/Linux) or `Ctrl + Option + Q` (Mac) in Yougile
 - The Company ID will appear on screen and automatically copy to your clipboard
 
 **Via API**
+
 - Use the `/api-v2/auth/companies` endpoint with your login credentials to list all your companies
 
 ## Installation
@@ -107,9 +111,7 @@ The server is configured through the global MCP configuration file. Update the c
   "mcpServers": {
     "yougile-mcp": {
       "command": "node",
-      "args": [
-        "D:\\Projects\\yougile-mcp\\yougile.cjs"
-      ],
+      "args": ["D:\\Projects\\yougile-mcp\\yougile.cjs"],
       "env": {
         "YOUGILE_API_KEY": "your_actual_api_key_here"
       },
@@ -128,9 +130,7 @@ typically located at `C:\Users\{username}\.kilocode\globalStorage\kilo code.kilo
   "mcpServers": {
     "yougile-mcp": {
       "command": "node",
-      "args": [
-        "D:\\Projects\\yougile-mcp\\yougile.cjs"
-      ],
+      "args": ["D:\\Projects\\yougile-mcp\\yougile.cjs"],
       "env": {
         "YOUGILE_API_KEY": "your_actual_api_key_here"
       }
@@ -146,9 +146,7 @@ Alternatively, if you prefer to manage your API key through system environment v
   "mcpServers": {
     "yougile-mcp": {
       "command": "node",
-      "args": [
-        "D:\\Projects\\yougile-mcp\\yougile.cjs"
-      ],
+      "args": ["D:\\Projects\\yougile-mcp\\yougile.cjs"],
       "env": {
         "YOUGILE_API_KEY": "${env.YOUGILE_API_KEY}"
       }
@@ -232,9 +230,7 @@ You can add Yougile to Claude Desktop by updating your MCP configuration file:
   "mcpServers": {
     "yougile-mcp": {
       "command": "node",
-      "args": [
-        "path/to/yougile.js"
-      ],
+      "args": ["path/to/yougile.js"],
       "env": {
         "YOUGILE_API_KEY": "${env.YOUGILE_API_KEY}"
       }
@@ -359,6 +355,17 @@ To run in development mode with auto-rebuild:
 npm run dev
 ```
 
+### Quality checks
+
+```bash
+npm run lint          # ESLint
+npm run format:check  # Prettier without modifying files
+npm test              # Build and run local unit/integration tests
+npm run check         # Run all checks above
+```
+
+The test suite uses Node.js's built-in test runner and a local mock HTTP API. It does not require or use real YouGile credentials.
+
 ## API Coverage
 
 This MCP server implements **~40%** of the YouGile API v2.0 endpoints.
@@ -373,6 +380,7 @@ This MCP server implements **~40%** of the YouGile API v2.0 endpoints.
 ### ✅ Implemented (30 tools)
 
 #### Users (6 methods)
+
 - `get_users` - Get all users
 - `get_me` - Get the current authenticated user (API key owner)
 - `get_user` - Get user by ID
@@ -381,12 +389,14 @@ This MCP server implements **~40%** of the YouGile API v2.0 endpoints.
 - `delete_user` - Remove user from company
 
 #### Projects (4 methods)
+
 - `get_projects` - Get all projects
 - `get_project` - Get project by ID
 - `create_project` - Create project
 - `update_project` - Update project
 
 #### Tasks (6 methods)
+
 - `get_tasks` - Get tasks with filters (columnId, assignedTo, title). **Note: projectId NOT supported!**
 - `get_user_tasks` - Get ALL tasks assigned to a user (recommended for complete list)
 - `get_task` - Get task by ID (supports UUID and task codes like "SAI-515")
@@ -394,18 +404,21 @@ This MCP server implements **~40%** of the YouGile API v2.0 endpoints.
 - `update_task` - Update task (supports completed, archived flags)
 
 #### Boards (4 methods)
+
 - `GET /api-v2/boards` - Get all boards
 - `GET /api-v2/boards/{id}` - Get board by ID
 - `POST /api-v2/boards` - Create board
 - `PUT /api-v2/boards/{id}` - Update board
 
 #### Columns (4 methods)
+
 - `GET /api-v2/columns` - Get all columns
 - `GET /api-v2/columns/{id}` - Get column by ID
 - `POST /api-v2/columns` - Create column
 - `PUT /api-v2/columns/{id}` - Update column
 
 #### Task Chat (3 methods)
+
 - `GET /api-v2/chats/{chatId}/messages` - Get task chat messages
 - `POST /api-v2/chats/{chatId}/messages` - Send message to task chat
 - `GET /api-v2/chats/{chatId}/messages` - Get task messages (alternative)
@@ -413,36 +426,46 @@ This MCP server implements **~40%** of the YouGile API v2.0 endpoints.
 ### ❌ Not Implemented (45+ endpoints)
 
 #### Auth
+
 - Companies list, API keys management (create, list, delete)
 
 #### Companies
+
 - Get company details, update company
 
 #### Departments
+
 - Full CRUD operations for departments
 
 #### Project Roles
+
 - Full CRUD operations for project roles
 
 #### Stickers
+
 - String stickers (with states) - full CRUD
 - Sprint stickers - full CRUD
 - Sticker states management
 
 #### Group Chats
+
 - Full CRUD operations for group chats
 
 #### Webhooks
+
 - Create, list, update webhooks
 
 #### Files
+
 - File upload functionality
 
 #### CRM
+
 - Contact persons management
 - External ID lookup
 
 #### Additional
+
 - Task chat subscribers management
 - Delete operations for tasks, boards, columns
 

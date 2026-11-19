@@ -14,14 +14,17 @@ export const registerStickerTools = (server: McpServer) => {
     "Get all string stickers (custom stickers with states) for a board",
     {
       boardId: z.string().optional().describe("Filter by board ID"),
-      limit: z.number().optional().describe("Limit number of stickers returned"),
+      limit: z
+        .number()
+        .optional()
+        .describe("Limit number of stickers returned"),
       offset: z.number().optional().describe("Offset for pagination"),
       name: z.string().optional().describe("Filter by sticker name"),
     },
     async ({ boardId, limit, offset, name }) => {
       const queryString = buildQueryString({ boardId, limit, offset, name });
-      const path = `string-stickers${queryString ? '?' + queryString : ''}`;
-      
+      const path = `string-stickers${queryString ? "?" + queryString : ""}`;
+
       const stickers = await makeYougileRequest<unknown>("GET", path);
       return {
         content: [
@@ -31,7 +34,7 @@ export const registerStickerTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 
   server.tool(
@@ -50,6 +53,6 @@ export const registerStickerTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 };

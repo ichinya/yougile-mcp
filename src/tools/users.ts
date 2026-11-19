@@ -21,8 +21,8 @@ export const registerUserTools = (server: McpServer) => {
     },
     async ({ limit, offset, email, projectId }) => {
       const queryString = buildQueryString({ limit, offset, email, projectId });
-      const path = `users${queryString ? '?' + queryString : ''}`;
-      
+      const path = `users${queryString ? "?" + queryString : ""}`;
+
       const users = await makeYougileRequest<ApiResponse<User>>("GET", path);
       return {
         content: [
@@ -32,7 +32,7 @@ export const registerUserTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 
   server.tool(
@@ -51,7 +51,7 @@ export const registerUserTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 
   server.tool(
@@ -68,7 +68,7 @@ export const registerUserTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 
   server.tool(
@@ -78,8 +78,14 @@ export const registerUserTools = (server: McpServer) => {
       email: z.string().email().describe("The email of the user to invite"),
       firstName: z.string().optional().describe("The first name of the user"),
       lastName: z.string().optional().describe("The last name of the user"),
-      role: z.string().optional().describe("The role of the user in the company"),
-      messengerOnly: z.boolean().optional().describe("Whether the user has access to the messenger only"),
+      role: z
+        .string()
+        .optional()
+        .describe("The role of the user in the company"),
+      messengerOnly: z
+        .boolean()
+        .optional()
+        .describe("Whether the user has access to the messenger only"),
     },
     async ({ email, firstName, lastName, role, messengerOnly }) => {
       const userData: Partial<User> = { email };
@@ -97,7 +103,7 @@ export const registerUserTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 
   server.tool(
@@ -105,10 +111,19 @@ export const registerUserTools = (server: McpServer) => {
     "Update an existing user",
     {
       id: z.string().describe("The ID of the user to update"),
-      firstName: z.string().optional().describe("The new first name of the user"),
+      firstName: z
+        .string()
+        .optional()
+        .describe("The new first name of the user"),
       lastName: z.string().optional().describe("The new last name of the user"),
-      role: z.string().optional().describe("The new role of the user in the company"),
-      messengerOnly: z.boolean().optional().describe("Whether the user has access to the messenger only"),
+      role: z
+        .string()
+        .optional()
+        .describe("The new role of the user in the company"),
+      messengerOnly: z
+        .boolean()
+        .optional()
+        .describe("Whether the user has access to the messenger only"),
     },
     async ({ id, firstName, lastName, role, messengerOnly }) => {
       const userData: Partial<User> = {};
@@ -117,7 +132,11 @@ export const registerUserTools = (server: McpServer) => {
       if (role) userData.role = role;
       if (messengerOnly !== undefined) userData.messengerOnly = messengerOnly;
 
-      const result = await makeYougileRequest<User>("PUT", `users/${id}`, userData);
+      const result = await makeYougileRequest<User>(
+        "PUT",
+        `users/${id}`,
+        userData,
+      );
       return {
         content: [
           {
@@ -126,7 +145,7 @@ export const registerUserTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 
   server.tool(
@@ -145,6 +164,6 @@ export const registerUserTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 };

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.0] - 2026-09-18
 
 ### Added
+
 - `get_me` tool returning the current authenticated user (`GET /users/me`)
 - `idempotencyKey` parameter for `create_task`, `create_project`, `create_board`, `create_column` (safe retries, no duplicates)
 - `messengerOnly` parameter for `create_user` and `update_user`
@@ -21,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Shared type definitions for User, Project, Task, Board, Column, ChatMessage, ApiResponse, FileUploadResponse, and QueryParams
 
 ### Changed
+
 - Synced bundled OpenAPI spec `docs/open-api-v2.json` with the live API: added `GET /users/me`, `POST /chats/{chatId}/typing`, `/companies{*companyId}` (was `/companies*`)
 - Updated Yargs from v17 to v18
 - Updated Zod from v3 to v4
@@ -31,12 +33,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed unused imports (fs, path) from files where they weren't needed
 
 ### Fixed
+
 - File upload response type handling to ensure string return type
 - TypeScript compilation issues with MCP SDK response types
 
 ## [1.1.0] - Previous Release
 
 ### Added
+
 - Initial MCP server implementation
 - CLI tool for Yougile API interaction
 - Support for users, projects, tasks, boards, columns, and task chat

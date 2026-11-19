@@ -14,12 +14,13 @@ import type { FileUploadResponse } from "../types/index.js";
  * @throws Error if upload fails
  */
 async function uploadFileToYougile(filePath: string): Promise<string> {
-  const hostUrl = process.env.YOUGILE_API_HOST_URL || "https://yougile.com/api-v2/";
+  const hostUrl =
+    process.env.YOUGILE_API_HOST_URL || "https://yougile.com/api-v2/";
   const host = hostUrl.endsWith("/") ? hostUrl : `${hostUrl}`;
   const url = `${host}upload-file`;
-  
+
   const headers: Record<string, string> = {
-    "Authorization": `Bearer ${process.env.YOUGILE_API_KEY || ""}`,
+    Authorization: `Bearer ${process.env.YOUGILE_API_KEY || ""}`,
   };
 
   logRequest("POST", url, headers, `file: ${filePath}`);
@@ -28,7 +29,7 @@ async function uploadFileToYougile(filePath: string): Promise<string> {
     const formData = new FormData();
     const fileContent = fs.readFileSync(filePath);
     const fileName = path.basename(filePath);
-    
+
     formData.append("file", new Blob([fileContent]), fileName);
 
     const response = await axios.post<FileUploadResponse>(url, formData, {
@@ -36,7 +37,7 @@ async function uploadFileToYougile(filePath: string): Promise<string> {
     });
 
     logResponse(url, response.status, response.data);
-    
+
     // Return the file URL
     const fileUrl = response.data.url || response.data.fileUrl;
     if (!fileUrl) {
@@ -45,7 +46,7 @@ async function uploadFileToYougile(filePath: string): Promise<string> {
     return fileUrl;
   } catch (error) {
     logError(url, error);
-    
+
     if (axios.isAxiosError(error)) {
       throw new Error(`File upload failed: ${error.message}`);
     }
@@ -71,28 +72,37 @@ export const registerFileTools = (server: McpServer) => {
           content: [
             {
               type: "text",
-              text: JSON.stringify({ 
-                success: true, 
-                filePath,
-                fileUrl 
-              }, null, 2),
+              text: JSON.stringify(
+                {
+                  success: true,
+                  filePath,
+                  fileUrl,
+                },
+                null,
+                2,
+              ),
             },
           ],
         };
       } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
         return {
           content: [
             {
               type: "text",
-              text: JSON.stringify({ 
-                success: false, 
-                error: errorMessage 
-              }, null, 2),
+              text: JSON.stringify(
+                {
+                  success: false,
+                  error: errorMessage,
+                },
+                null,
+                2,
+              ),
             },
           ],
         };
       }
-    }
+    },
   );
 };

@@ -19,6 +19,7 @@ Thank you for your interest in contributing to the Yougile MCP Server!
 ### Running in Development Mode
 
 For auto-rebuild during development:
+
 ```bash
 npm run dev
 ```
@@ -26,6 +27,7 @@ npm run dev
 ### Building
 
 To build the TypeScript code:
+
 ```bash
 npm run build
 ```
@@ -33,6 +35,7 @@ npm run build
 ### Code Style
 
 This project follows the type-safety and code-style guidelines below. Ensure the TypeScript build passes before submitting changes:
+
 ```bash
 npm run build
 ```

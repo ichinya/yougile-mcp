@@ -23,7 +23,7 @@ export const registerProjectTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 
   server.tool(
@@ -33,7 +33,10 @@ export const registerProjectTools = (server: McpServer) => {
       id: z.string().describe("The ID of the project to retrieve"),
     },
     async ({ id }) => {
-      const project = await makeYougileRequest<unknown>("GET", `projects/${id}`);
+      const project = await makeYougileRequest<unknown>(
+        "GET",
+        `projects/${id}`,
+      );
       return {
         content: [
           {
@@ -42,7 +45,7 @@ export const registerProjectTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 
   server.tool(
@@ -50,10 +53,23 @@ export const registerProjectTools = (server: McpServer) => {
     "Create a new project",
     {
       title: z.string().describe("The name/title of the project"),
-      description: z.string().optional().describe("The description of the project"),
+      description: z
+        .string()
+        .optional()
+        .describe("The description of the project"),
       color: z.string().optional().describe("Color code for the project"),
-      departments: z.record(z.string(), z.record(z.string(), z.string())).optional().describe("Departments on the project and role mapping: department ID → { manager, member }"),
-      idempotencyKey: z.string().optional().describe("Idempotency key: retrying the request with the same key returns the already created project instead of duplicating it"),
+      departments: z
+        .record(z.string(), z.record(z.string(), z.string()))
+        .optional()
+        .describe(
+          "Departments on the project and role mapping: department ID → { manager, member }",
+        ),
+      idempotencyKey: z
+        .string()
+        .optional()
+        .describe(
+          "Idempotency key: retrying the request with the same key returns the already created project instead of duplicating it",
+        ),
     },
     async ({ title, description, color, departments, idempotencyKey }) => {
       const projectData: Partial<Project> & IdempotentCreate = { title };
@@ -62,7 +78,11 @@ export const registerProjectTools = (server: McpServer) => {
       if (departments) projectData.departments = departments;
       if (idempotencyKey) projectData.idempotencyKey = idempotencyKey;
 
-      const result = await makeYougileRequest<Project>("POST", "projects", projectData);
+      const result = await makeYougileRequest<Project>(
+        "POST",
+        "projects",
+        projectData,
+      );
       return {
         content: [
           {
@@ -71,7 +91,7 @@ export const registerProjectTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 
   server.tool(
@@ -79,10 +99,21 @@ export const registerProjectTools = (server: McpServer) => {
     "Update an existing project",
     {
       id: z.string().describe("The ID of the project to update"),
-      title: z.string().optional().describe("The new name/title of the project"),
-      description: z.string().optional().describe("The new description of the project"),
+      title: z
+        .string()
+        .optional()
+        .describe("The new name/title of the project"),
+      description: z
+        .string()
+        .optional()
+        .describe("The new description of the project"),
       color: z.string().optional().describe("New color code for the project"),
-      departments: z.record(z.string(), z.record(z.string(), z.string())).optional().describe("Departments and role mapping: department ID → { manager, member }. Use department ID '-' to remove a department binding"),
+      departments: z
+        .record(z.string(), z.record(z.string(), z.string()))
+        .optional()
+        .describe(
+          "Departments and role mapping: department ID → { manager, member }. Use department ID '-' to remove a department binding",
+        ),
     },
     async ({ id, title, description, color, departments }) => {
       const projectData: Partial<Project> = {};
@@ -91,7 +122,11 @@ export const registerProjectTools = (server: McpServer) => {
       if (color) projectData.color = color;
       if (departments) projectData.departments = departments;
 
-      const result = await makeYougileRequest<Project>("PUT", `projects/${id}`, projectData);
+      const result = await makeYougileRequest<Project>(
+        "PUT",
+        `projects/${id}`,
+        projectData,
+      );
       return {
         content: [
           {
@@ -100,6 +135,6 @@ export const registerProjectTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 };

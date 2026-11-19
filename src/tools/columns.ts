@@ -21,8 +21,8 @@ export const registerColumnTools = (server: McpServer) => {
     },
     async ({ boardId, limit, offset, title }) => {
       const queryString = buildQueryString({ boardId, limit, offset, title });
-      const path = `columns${queryString ? '?' + queryString : ''}`;
-      
+      const path = `columns${queryString ? "?" + queryString : ""}`;
+
       const columns = await makeYougileRequest<unknown>("GET", path);
       return {
         content: [
@@ -32,7 +32,7 @@ export const registerColumnTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 
   server.tool(
@@ -51,7 +51,7 @@ export const registerColumnTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 
   server.tool(
@@ -60,18 +60,30 @@ export const registerColumnTools = (server: McpServer) => {
     {
       title: z.string().describe("The title of the column"),
       boardId: z.string().describe("The ID of the board the column belongs to"),
-      description: z.string().optional().describe("The description of the column"),
-      idempotencyKey: z.string().optional().describe("Idempotency key: retrying the request with the same key returns the already created column instead of duplicating it"),
+      description: z
+        .string()
+        .optional()
+        .describe("The description of the column"),
+      idempotencyKey: z
+        .string()
+        .optional()
+        .describe(
+          "Idempotency key: retrying the request with the same key returns the already created column instead of duplicating it",
+        ),
     },
     async ({ title, boardId, description, idempotencyKey }) => {
       const columnData: Partial<Column> & IdempotentCreate = {
         title,
-        boardId
+        boardId,
       };
       if (description) columnData.description = description;
       if (idempotencyKey) columnData.idempotencyKey = idempotencyKey;
 
-      const result = await makeYougileRequest<Column>("POST", "columns", columnData);
+      const result = await makeYougileRequest<Column>(
+        "POST",
+        "columns",
+        columnData,
+      );
       return {
         content: [
           {
@@ -80,7 +92,7 @@ export const registerColumnTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 
   server.tool(
@@ -89,14 +101,21 @@ export const registerColumnTools = (server: McpServer) => {
     {
       id: z.string().describe("The ID of the column to update"),
       title: z.string().optional().describe("The new title of the column"),
-      description: z.string().optional().describe("The new description of the column"),
+      description: z
+        .string()
+        .optional()
+        .describe("The new description of the column"),
     },
     async ({ id, title, description }) => {
       const columnData: Partial<Column> = {};
       if (title) columnData.title = title;
       if (description) columnData.description = description;
 
-      const result = await makeYougileRequest<Column>("PUT", `columns/${id}`, columnData);
+      const result = await makeYougileRequest<Column>(
+        "PUT",
+        `columns/${id}`,
+        columnData,
+      );
       return {
         content: [
           {
@@ -105,6 +124,6 @@ export const registerColumnTools = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
 };
